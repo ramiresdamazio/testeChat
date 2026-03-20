@@ -4,6 +4,7 @@ import fastifySocketIo from '@wick_studio/fastify-socket.io'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { sequelize } from './config/database.js'
+import userRoutes from './routes.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -15,9 +16,10 @@ fastify.register(fastifyStatic, {
 })
 
 fastify.register(fastifySocketIo)
+fastify.register(userRoutes)
 
 fastify.get('/', async function handler(request, reply) {
-    return { hello: 'To vivo muleke' }
+    return { hello: 'world' }
 })
 
 await fastify.ready()
@@ -28,6 +30,7 @@ fastify.io.on('connection', (socket) => {
 
 try {
     await sequelize.authenticate()
+    await sequelize.sync()
     fastify.log.info("Banco de dados conectado ao fastify/io")
     await fastify.listen({ port: 3000 })
 } catch (err) {
