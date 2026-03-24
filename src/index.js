@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import Fastify from 'fastify'
 import fastifyStatic from '@fastify/static'
 import fastifySocketIo from '@wick_studio/fastify-socket.io'
