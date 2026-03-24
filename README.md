@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://i.ibb.co/6P0J9Xh/chat-icon.png" alt="Logo" width="120" height="auto" />
+  
   <h1>✨ Ramires Chat ✨</h1>
   <p><b>Uma aplicação de chat em tempo real de alta performance com design Glassmorphism.</b></p>
   
