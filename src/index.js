@@ -30,7 +30,6 @@ const onlineUsers = new Map()
 fastify.io.on('connection', (socket) => {
     fastify.log.info(`✅ Novo usuário conectado com sucesso: ${socket.id}`)
 
-    // Escuta quando o frontend logar
     socket.on('entrar_chat', (usuario) => {
         onlineUsers.set(socket.id, usuario)
         fastify.io.emit('usuarios_online', Array.from(onlineUsers.values()))
@@ -44,14 +43,13 @@ fastify.io.on('connection', (socket) => {
             replyToId: replyToId || null
         })
 
-        // Vamos melhorar a resposta para enviar o nome de quem mandou e o quote
         const mensagemCompleta = await Message.findByPk(mensagemSalva.id, {
             include: [
                 { model: User, attributes: ['name'] },
-                { 
-                  model: Message, 
-                  as: 'replyTo', 
-                  include: [{ model: User, attributes: ['name'] }] 
+                {
+                    model: Message,
+                    as: 'replyTo',
+                    include: [{ model: User, attributes: ['name'] }]
                 }
             ]
         })
@@ -74,17 +72,16 @@ fastify.io.on('connection', (socket) => {
         const mensagemAtualizada = await Message.findByPk(msgId, {
             include: [
                 { model: User, attributes: ['name'] },
-                { 
-                  model: Message, 
-                  as: 'replyTo', 
-                  include: [{ model: User, attributes: ['name'] }] 
+                {
+                    model: Message,
+                    as: 'replyTo',
+                    include: [{ model: User, attributes: ['name'] }]
                 }
             ]
         })
         fastify.io.emit('nova_mensagem', mensagemAtualizada)
     })
 
-    // --- Typing Indicators ---
     socket.on('digitando', (username) => {
         socket.broadcast.emit('usuario_digitando', username)
     })
@@ -93,7 +90,6 @@ fastify.io.on('connection', (socket) => {
         socket.broadcast.emit('usuario_parou_digitar', username)
     })
 
-    // Apaga o usuário quando ele fechar a aba
     socket.on('disconnect', () => {
         onlineUsers.delete(socket.id)
         fastify.io.emit('usuarios_online', Array.from(onlineUsers.values()))
@@ -104,17 +100,15 @@ try {
     await sequelize.authenticate()
     User.hasMany(Message, { foreignKey: 'userId' })
     Message.belongsTo(User, { foreignKey: 'userId' })
-    
-    // Auto-relacionamento para Respostas (Reply)
+
     Message.belongsTo(Message, { as: 'replyTo', foreignKey: 'replyToId' })
-    
+
     await sequelize.sync({ alter: true })
     fastify.log.info("Banco de dados conectado ao fastify/io")
-    
-    // --- LIMPEZA AUTOMÁTICA (24H) ---
+
     async function cleanupOldMessages() {
         try {
-            const threshold = new Date(Date.now() - 24 * 60 * 60 * 1000); // 24 horas atrás
+            const threshold = new Date(Date.now() - 24 * 60 * 60 * 1000);
             const deleted = await Message.destroy({
                 where: {
                     createdAt: {
@@ -130,7 +124,6 @@ try {
         }
     }
 
-    // Executa agora ao iniciar e depois a cada 1 hora
     cleanupOldMessages();
     setInterval(cleanupOldMessages, 60 * 60 * 1000);
 

@@ -41,10 +41,10 @@ export default async function userRouts(fastify, options) {
         const messages = await Message.findAll({
             include: [
                 { model: User, attributes: ['name'] },
-                { 
-                  model: Message, 
-                  as: 'replyTo', 
-                  include: [{ model: User, attributes: ['name'] }] 
+                {
+                    model: Message,
+                    as: 'replyTo',
+                    include: [{ model: User, attributes: ['name'] }]
                 }
             ],
             order: [['createdAt', 'ASC']]
